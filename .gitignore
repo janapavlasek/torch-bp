@@ -1,0 +1,19 @@
+# Notebook files.
+*/.ipynb_checkpoints/*
+*checkpoint.ipynb
+
+# Output.
+output/
+
+# Python.
+__pycache__/
+*.pyc
+
+# Package files
+*.egg
+*.eggs/
+.installed.cfg
+*.egg-info
+
+# Personal configs
+.vscode/

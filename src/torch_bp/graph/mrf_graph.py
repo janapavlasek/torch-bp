@@ -155,7 +155,7 @@ def edge_n_factor_to_mrf_graph(num_nodes: int,
     Input:
     - num_nodes: int, number of nodes in graph
     - factor_edges: Iterable of tuple[int], each represent a connection (each either len 1 or 2)
-    - factors: Iterable of Factor, corresponding Factor object to each edge
+    - factors: Iterable of UnaryFactor | PairwiseFactor, corresponding Factor object to each edge
     """
     # create dict from lists
     factor_dict = {factor_edge: factor for factor_edge, factor in zip(factor_edges, factors)}

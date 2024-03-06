@@ -24,18 +24,12 @@ class Kernel(object):
 
 
 class BatchKernel(Kernel):
-    def __init__(self, kernel_fn):
+    def __init__(self, kernel_fn: Kernel):
         super(BatchKernel, self).__init__()
         self.kernel = kernel_fn
-
-        self.forward = vmap(self.kernel)
-
-    def backward(self, x, y):
-        k_xy = self.forward(x, y)
-        batch_jac_fn = vmap(jacrev(self.kernel))
-        d_kx, d_ky = batch_jac_fn(x, y).sum(-2), batch_jac_fn(y, x).sum(-2)
-        return k_xy, d_kx, d_ky
-
+        # self.forward = self.kernel
+        self.forward = vmap(self.kernel.forward)
+        self.backward = vmap(self.kernel.backward)
 
 class RBFKernel(Kernel):
     def __init__(self, sigma=1, distance_fn=None):
@@ -96,7 +90,8 @@ class RBFMedianKernel(RBFKernel):
             return K_XY
 
     def backward(self, x, y):
-        dist, d_diffs_x, d_diffs_y = self.distance_fn.backward(x, y)
+
+        dist, d_diff_x, d_diff_y = self.distance_fn.backward(x, y)
 
         # Apply the median heuristic (PyTorch does not give true median)
         if self.gamma is None:
@@ -108,8 +103,8 @@ class RBFMedianKernel(RBFKernel):
 
         k_xy = (- gamma * dist).exp()
 
-        d_kx = -2 * gamma * d_diffs_x * k_xy.unsqueeze(-1)
-        d_ky = -2 * gamma * d_diffs_y * k_xy.unsqueeze(-1)
+        d_kx = -gamma * d_diff_x * k_xy.unsqueeze(-1)
+        d_ky = -gamma * d_diff_y * k_xy.unsqueeze(-1)
 
         return k_xy, d_kx, d_ky
 

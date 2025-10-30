@@ -616,7 +616,7 @@ class LoopySVBP(SVBP):
         # log_msgs[s, t] is log(msg_{s -> t})
         if self.msg_init_mode == "uniform":
             self.log_msgs = [
-                [torch.log(torch.ones(self.K, dtype=torch.float32) / self.K)
+                [torch.log(torch.ones(self.K, **self.tensor_kwargs) / self.K)
                  for n in self.graph.get_nbrs(node)]
                 for node in range(self.graph.N)
             ]
